@@ -5,9 +5,11 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
+  PuzzlePieceIcon,
 } from "@heroicons/react/24/solid";
 import { Home, FokusMode, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
+import GameSceneEditor from "@/widgets/game/GameSceneEditor";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -40,6 +42,12 @@ export const routes = [
         name: "notifications",
         path: "/notifications",
         element: <Notifications />,
+      },
+      {
+        icon: <PuzzlePieceIcon {...icon} />,
+        name: "game editor",
+        path: "/game",
+        element: <GameSceneEditor />,
       },
     ],
   },
