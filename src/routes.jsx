@@ -7,9 +7,9 @@ import {
   RectangleStackIcon,
   PuzzlePieceIcon,
 } from "@heroicons/react/24/solid";
-import { Home, FokusMode, Tables, Notifications } from "@/pages/dashboard";
+import { Home, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
-import GameSceneEditor from "@/widgets/game/GameSceneEditor";
+import PetGame from "@/widgets/game/PetGame";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -26,12 +26,6 @@ export const routes = [
         element: <Home />,
       },
       {
-        icon: <UserCircleIcon {...icon} />,
-        name: "FokusMode",
-        path: "/fokusmode",
-        element: <FokusMode />,
-      },
-      {
         icon: <TableCellsIcon {...icon} />,
         name: "tables",
         path: "/tables",
@@ -45,10 +39,10 @@ export const routes = [
       },
       {
         icon: <PuzzlePieceIcon {...icon} />,
-        name: "game editor",
+        name: "pet space",
         path: "/game",
-        element: <GameSceneEditor />,
-      },
+        element: <PetGame />,
+      }
     ],
   },
   {
