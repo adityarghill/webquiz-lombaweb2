@@ -6,8 +6,9 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
   PuzzlePieceIcon,
+  CircleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Tables, Notifications } from "@/pages/dashboard";
+import { Home, Tables, FokusMode, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
 import PetGame from "@/widgets/game/PetGame";
 
@@ -24,6 +25,12 @@ export const routes = [
         name: "dashboard",
         path: "/home",
         element: <Home />,
+      },
+      {
+        icon: <TableCellsIcon {...icon} />,
+        name: "Fokus Mode",
+        path: "/focus-mode",
+        element: <FokusMode />,
       },
       {
         icon: <TableCellsIcon {...icon} />,

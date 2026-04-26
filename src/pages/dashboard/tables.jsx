@@ -1,221 +1,138 @@
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Typography,
-  Avatar,
-  Chip,
-  Tooltip,
-  Progress,
-} from "@material-tailwind/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { authorsTableData, projectsTableData } from "@/data";
+import React from 'react';
+import Tooltip from '@uiw/react-tooltip';
+import HeatMap from '@uiw/react-heat-map';
 
-export function Tables() {
+const heatmapValue = [
+  { date: '2016/01/11', count: 2 },
+  ...[...Array(17)].map((_, idx) => ({ date: `2016/01/${idx + 10}`, count: idx, })),
+  ...[...Array(17)].map((_, idx) => ({ date: `2016/02/${idx + 10}`, count: idx, })),
+  { date: '2016/04/12', count: 2 },
+  { date: '2016/05/01', count: 5 },
+  { date: '2016/05/02', count: 5 },
+  { date: '2016/05/03', count: 1 },
+  { date: '2016/05/04', count: 11 },
+  { date: '2016/05/08', count: 32 },
+];
+
+const productiveHours = [
+  { time: '07:00 - 09:00', status: 'Sedang', color: 'bg-yellow-500' },
+  { time: '09:00 - 11:00', status: 'Sangat Tinggi', color: 'bg-green-500' },
+  { time: '11:00 - 13:00', status: 'Cukup', color: 'bg-blue-500' },
+  { time: '14:00 - 16:00', status: 'Rendah', color: 'bg-red-500' },
+  { time: '16:00 - 18:00', status: 'Sedang', color: 'bg-yellow-500' },
+  { time: '19:00 - 21:00', status: 'Tinggi', color: 'bg-green-400' },
+  { time: '21:00 - 23:00', status: 'Cukup', color: 'bg-blue-500' },
+];
+
+const weeklyPattern = [
+  { day: 'Senin', productivity: 90, status: 'Produktif', color: 'bg-green-500' },
+  { day: 'Selasa', productivity: 85, status: 'Produktif', color: 'bg-green-500' },
+  { day: 'Rabu', productivity: 80, status: 'Sangat Produktif', color: 'bg-green-500' },
+  { day: 'Kamis', productivity: 75, status: 'Sangat Produktif', color: 'bg-green-500' },
+  { day: 'Jumat', productivity: 65, status: 'Produktif', color: 'bg-yellow-500' },
+  { day: 'Sabtu', productivity: 40, status: 'Kurang Aktif', color: 'bg-red-500' },
+  { day: 'Minggu', productivity: 30, status: 'Kurang Aktif', color: 'bg-red-500' },
+];
+
+export const Tables = () => {
   return (
-    <div className="mt-12 mb-8 flex flex-col gap-12">
-      <Card>
-        <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-          <Typography variant="h6" color="white">
-            Authors Table
-          </Typography>
-        </CardHeader>
-        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-          <table className="w-full min-w-[640px] table-auto">
-            <thead>
-              <tr>
-                {["author", "function", "status", "employed", ""].map((el) => (
-                  <th
-                    key={el}
-                    className="border-b border-blue-gray-50 py-3 px-5 text-left"
-                  >
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      {el}
-                    </Typography>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {authorsTableData.map(
-                ({ img, name, email, job, online, date }, key) => {
-                  const className = `py-3 px-5 ${
-                    key === authorsTableData.length - 1
-                      ? ""
-                      : "border-b border-blue-gray-50"
-                  }`;
+    <div className="max-w-6xl mx-auto p-6 text-black">
+      <h1 className="text-3xl font-bold mb-2">Behavior Analysis</h1>
+      <p className="text-gray-800 mb-8">Laporan mingguan kapan kamu produktif & kapan malis</p>
 
-                  return (
-                    <tr key={name}>
-                      <td className={className}>
-                        <div className="flex items-center gap-4">
-                          <Avatar src={img} alt={name} size="sm" variant="rounded" />
-                          <div>
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-semibold"
-                            >
-                              {name}
-                            </Typography>
-                            <Typography className="text-xs font-normal text-blue-gray-500">
-                              {email}
-                            </Typography>
-                          </div>
-                        </div>
-                      </td>
-                      <td className={className}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {job[0]}
-                        </Typography>
-                        <Typography className="text-xs font-normal text-blue-gray-500">
-                          {job[1]}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <Chip
-                          variant="gradient"
-                          color={online ? "green" : "blue-gray"}
-                          value={online ? "online" : "offline"}
-                          className="py-0.5 px-2 text-[11px] font-medium w-fit"
-                        />
-                      </td>
-                      <td className={className}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {date}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <Typography
-                          as="a"
-                          href="#"
-                          className="text-xs font-semibold text-blue-gray-600"
-                        >
-                          Edit
-                        </Typography>
-                      </td>
-                    </tr>
-                  );
-                }
-              )}
-            </tbody>
-          </table>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-          <Typography variant="h6" color="white">
-            Projects Table
-          </Typography>
-        </CardHeader>
-        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-          <table className="w-full min-w-[640px] table-auto">
-            <thead>
-              <tr>
-                {["companies", "members", "budget", "completion", ""].map(
-                  (el) => (
-                    <th
-                      key={el}
-                      className="border-b border-blue-gray-50 py-3 px-5 text-left"
-                    >
-                      <Typography
-                        variant="small"
-                        className="text-[11px] font-bold uppercase text-blue-gray-400"
-                      >
-                        {el}
-                      </Typography>
-                    </th>
-                  )
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {projectsTableData.map(
-                ({ img, name, members, budget, completion }, key) => {
-                  const className = `py-3 px-5 ${
-                    key === projectsTableData.length - 1
-                      ? ""
-                      : "border-b border-blue-gray-50"
-                  }`;
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Heatmap Aktivitas */}
+        <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg">
+          <div className="flex items-center mb-4">
+            <div className="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
+            <h2 className="text-lg font-semibold">HEATMAP AKTIVITAS</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <HeatMap
+              value={heatmapValue}
+              width={480}
+              height={200}
+              startDate={new Date('2016/01/01')}
+              rectRender={(props, data) => {
+                return (
+                  <Tooltip placement="top" content={`aktivitas: ${data.count || 0}`}>
+                    <rect {...props} />
+                  </Tooltip>
+                );
+              }}
+            />
+          </div>
+        </div>
 
-                  return (
-                    <tr key={name}>
-                      <td className={className}>
-                        <div className="flex items-center gap-4">
-                          <Avatar src={img} alt={name} size="sm" />
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-bold"
-                          >
-                            {name}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={className}>
-                        {members.map(({ img, name }, key) => (
-                          <Tooltip key={name} content={name}>
-                            <Avatar
-                              src={img}
-                              alt={name}
-                              size="xs"
-                              variant="circular"
-                              className={`cursor-pointer border-2 border-white ${
-                                key === 0 ? "" : "-ml-2.5"
-                              }`}
-                            />
-                          </Tooltip>
-                        ))}
-                      </td>
-                      <td className={className}>
-                        <Typography
-                          variant="small"
-                          className="text-xs font-medium text-blue-gray-600"
-                        >
-                          {budget}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <div className="w-10/12">
-                          <Typography
-                            variant="small"
-                            className="mb-1 block text-xs font-medium text-blue-gray-600"
-                          >
-                            {completion}%
-                          </Typography>
-                          <Progress
-                            value={completion}
-                            variant="gradient"
-                            color={completion === 100 ? "green" : "gray"}
-                            className="h-1"
-                          />
-                        </div>
-                      </td>
-                      <td className={className}>
-                        <Typography
-                          as="a"
-                          href="#"
-                          className="text-xs font-semibold text-blue-gray-600"
-                        >
-                          <EllipsisVerticalIcon
-                            strokeWidth={2}
-                            className="h-5 w-5 text-inherit"
-                          />
-                        </Typography>
-                      </td>
-                    </tr>
-                  );
-                }
-              )}
-            </tbody>
-          </table>
-        </CardBody>
-      </Card>
+        {/* Jam Paling Produktif */}
+        <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg">
+          <div className="flex items-center mb-4">
+            <div className="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+            <h2 className="text-lg font-semibold">JAM PALING PRODUKTIF</h2>
+          </div>
+          <div className="space-y-3">
+            {productiveHours.map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between">
+                <span className="text-sm text-black">{item.time}</span>
+                <div className="flex items-center gap-2 flex-1 ml-4">
+                  <div className={`h-2 rounded flex-1 ${item.color}`}></div>
+                  <span className={`text-xs font-semibold ${
+                    item.status.includes('Sangat') ? 'text-green-400' : 
+                    item.status.includes('Tinggi') ? 'text-green-300' :
+                    item.status.includes('Sedang') ? 'text-yellow-400' :
+                    item.status.includes('Cukup') ? 'text-blue-400' :
+                    'text-red-400'
+                  }`}>
+                    {item.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Pola Minggu */}
+      <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg mb-8">
+        <div className="flex items-center mb-4">
+          <div className="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+          <h2 className="text-lg font-semibold">POLA MINGGU - KAPAN KAMU PRODUKTIF?</h2>
+        </div>
+        <div className="space-y-3">
+          {weeklyPattern.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-4">
+              <span className="w-12 text-sm font-medium">{item.day}</span>
+              <div className="flex-1 flex items-center gap-2">
+                <div className={`h-3 rounded ${item.color}`} style={{ width: `${item.productivity}%` }}></div>
+                <span className="text-xs text-black">{item.productivity}%</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {item.status === 'Sangat Produktif' && <span className="text-green-400">🎯</span>}
+                {item.status === 'Produktif' && <span className="text-green-400">✓</span>}
+                {item.status === 'Kurang Aktif' && <span className="text-red-400">⚠️</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Laporan AI Mingguan */}
+      <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg">
+        <div className="flex items-center mb-4">
+          <div className="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+          <h2 className="text-lg font-semibold">LAPORAN AI MINGGUAN</h2>
+        </div>
+        <p className="text-black mb-4">
+          Berdasarkan data belajarmu minggu ini, <span className="text-cyan-400 font-semibold">Ahmad</span> menunjukkan pola yang sangat konsisten. Kamu paling produktif di <span className="text-cyan-400 font-semibold">Rabu-Kamis pagi</span> dengan rata-rata fokus tertinggi (85/100).
+        </p>
+        <div className="bg-gray-700 p-4 rounded mb-4 border-l-4 border-yellow-500">
+          <p className="text-yellow-400 font-semibold mb-1">⚠️ Catatan: ada penurunan signifikan di</p>
+          <p className="text-yellow-300 text-sm">Sabtu sore - kemungkinkan kelelahan setelah seminggu penuh. Rekomendasi: jadwalkan sesli ringan di Sabtu, dan istirahat penuh di Minggu pagi.</p>
+        </div>
+        <p className="text-green-400 text-sm">
+          🎯 <span className="font-semibold">Target minggu depan</span> Pertahankan 4 jam/hari, fokuskan Matematika yang masih 60% tertinggal.
+        </p>
+      </div>
     </div>
   );
-}
-
-export default Tables;
+};

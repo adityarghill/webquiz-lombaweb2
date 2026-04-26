@@ -1,226 +1,317 @@
+import { useState, useEffect } from "react";
 import {
   Card,
   CardBody,
-  CardHeader,
-  CardFooter,
-  Avatar,
   Typography,
-  Tabs,
-  TabsHeader,
-  Tab,
-  Switch,
-  Tooltip,
   Button,
+  Input,
 } from "@material-tailwind/react";
 import {
-  HomeIcon,
-  ChatBubbleLeftEllipsisIcon,
-  Cog6ToothIcon,
-  PencilIcon,
+  PlayIcon,
+  PauseIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/solid";
-import { Link } from "react-router-dom";
-import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
-import { platformSettingsData, conversationsData, projectsData } from "@/data";
 
-export function Profile() {
+export function FokusMode() {
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [focusMode, setFocusMode] = useState("deep");
+  const [sessionCount, setSessionCount] = useState(0);
+  const [material, setMaterial] = useState("");
+  const [target, setTarget] = useState("");
+  const [sessions, setSessions] = useState([]);
+
+  const focusModes = {
+    deep: { name: "Deep Focus", color: "text-pink-500", duration: 25 * 60 },
+    light: { name: "Light Study", color: "text-yellow-400", duration: 20 * 60 },
+    break: { name: "Break", color: "text-red-500", duration: 5 * 60 },
+  };
+
+  const durations = [15, 25, 45, 60, 90];
+
+  useEffect(() => {
+    let interval;
+    if (isRunning && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && isRunning) {
+      setIsRunning(false);
+      setSessionCount((prev) => prev + 1);
+      if (sessions.length < 5) {
+        setSessions([
+          ...sessions,
+          {
+            id: Date.now(),
+            material,
+            target,
+            duration: focusModes[focusMode].duration,
+          },
+        ]);
+      }
+    }
+    return () => clearInterval(interval);
+  }, [isRunning, timeLeft, focusMode, material, target, sessions]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleDurationChange = (minutes) => {
+    setTimeLeft(minutes * 60);
+    setIsRunning(false);
+  };
+
+  const handleReset = () => {
+    setTimeLeft(focusModes[focusMode].duration);
+    setIsRunning(false);
+  };
+
+  const handleFocusModeChange = (mode) => {
+    setFocusMode(mode);
+    setTimeLeft(focusModes[mode].duration);
+    setIsRunning(false);
+  };
+
   return (
-    <>
-      <div
-        className="relative mt-8 h-72 w-full overflow-hidden rounded-xl bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${import.meta.env.BASE_URL}img/background-image.png)`,
-        }}
-      >
-        <div className="absolute inset-0 h-full w-full bg-gray-900/75" />
-      </div>
-      <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
-        <CardBody className="p-4">
-          <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
-            <div className="flex items-center gap-6">
-              <Avatar
-                src="/img/bruce-mars.jpeg"
-                alt="bruce-mars"
-                size="xl"
-                variant="rounded"
-                className="rounded-lg shadow-lg shadow-blue-gray-500/40"
-              />
-              <div>
-                <Typography variant="h5" color="blue-gray" className="mb-1">
-                  Richard Davis
-                </Typography>
-                <Typography
-                  variant="small"
-                  className="font-normal text-blue-gray-600"
-                >
-                  CEO / Co-Founder
-                </Typography>
-              </div>
-            </div>
-            <div className="w-96">
-              <Tabs value="app">
-                <TabsHeader>
-                  <Tab value="app">
-                    <HomeIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    App
-                  </Tab>
-                  <Tab value="message">
-                    <ChatBubbleLeftEllipsisIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
-                    Message
-                  </Tab>
-                  <Tab value="settings">
-                    <Cog6ToothIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    Settings
-                  </Tab>
-                </TabsHeader>
-              </Tabs>
-            </div>
-          </div>
-          <div className="gird-cols-1 mb-12 grid gap-12 px-4 lg:grid-cols-2 xl:grid-cols-3">
-            <div>
-              <Typography variant="h6" color="blue-gray" className="mb-3">
-                Platform Settings
-              </Typography>
-              <div className="flex flex-col gap-12">
-                {platformSettingsData.map(({ title, options }) => (
-                  <div key={title}>
-                    <Typography className="mb-4 block text-xs font-semibold uppercase text-blue-gray-500">
-                      {title}
-                    </Typography>
-                    <div className="flex flex-col gap-6">
-                      {options.map(({ checked, label }) => (
-                        <Switch
-                          key={label}
-                          id={label}
-                          label={label}
-                          defaultChecked={checked}
-                          labelProps={{
-                            className: "text-sm font-normal text-blue-gray-500",
-                          }}
-                        />
-                      ))}
+    <div className="p-4 bg-gradient-to-br from-slate-800 to-slate-900 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <Typography variant="h2" className="text-blackgray mb-2">
+            Pomodoro Smart
+          </Typography>
+          <Typography className="text-blue-gray-400">
+            Timer cerdas yang menyesuaikan dirimu
+          </Typography>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Panel - Timer */}
+          <div className="lg:col-span-1">
+            <Card className="bg-slate-700 border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white">
+              <CardBody className="text-center">
+                {/* Focus Modes */}
+                <div className="flex gap-3 justify-center mb-6">
+                  {Object.entries(focusModes).map(([key, { name, color }]) => (
+                    <Button
+                        key={key}
+                        onClick={() => handleFocusModeChange(key)}
+                        className={`py-2 px-4 text-sm rounded-lg transition ${
+                          focusMode === key
+                            ? "bg-lemon border-2 border-black text-black "
+                            : "bg-slate-600 text-black"
+                        }`}
+                      >
+                        <span className={focusMode === key ? "" : color}>
+                          {focusMode === key ? "✓ " : ""}
+                        </span>
+                        {name}
+                      </Button>
+                  ))}
+                </div>
+
+                {/* Timer Display */}
+                <div className="mb-8">
+                  <div className="relative w-48 h-48 mx-auto mb-4">
+                    <svg
+                      className="w-full h-full transform -rotate-90"
+                      viewBox="0 0 200 200"
+                    >
+                      <circle
+                        cx="100"
+                        cy="100"
+                        r="90"
+                        fill="none"
+                        stroke="#334155"
+                        strokeWidth="2"
+                      />
+                      <circle
+                        cx="100"
+                        cy="100"
+                        r="90"
+                        fill="none"
+                        stroke="#3b82f6"
+                        strokeWidth="3"
+                        strokeDasharray={`${
+                          (565 * timeLeft) /
+                          focusModes[focusMode].duration
+                        } 565`}
+                        strokeLinecap="round"
+                      />
+                      <circle
+                        cx="100"
+                        cy="100"
+                        r="70"
+                        fill="#1e293b"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Typography
+                        variant="h1"
+                        className="text-white text-4xl font-bold"
+                      >
+                        {formatTime(timeLeft)}
+                      </Typography>
                     </div>
                   </div>
+                  <Typography className="text-blue-gray-400 uppercase tracking-wider">
+                    {focusModes[focusMode].name}
+                  </Typography>
+                </div>
+
+                {/* Controls */}
+                <div className="flex justify-center gap-4 mb-6">
+                  <Button
+                    onClick={() => setIsRunning(!isRunning)}
+                    className="bg-lemon hover:bg-blue-600 text-blackgray rounded-full p-4 w-16 h-16 flex items-center justify-center"
+                  >
+                    {isRunning ? (
+                      <PauseIcon className="w-6 h-6" />
+                    ) : (
+                      <PlayIcon className="w-6 h-6" />
+                    )}
+                  </Button>
+                  <Button
+                    onClick={handleReset}
+                    className="bg-slate-600 hover:bg-slate-500 text-blackgray rounded-full p-4 w-16 h-16 flex items-center justify-center"
+                  >
+                    <ArrowPathIcon className="w-6 h-6" />
+                  </Button>
+                </div>
+
+                {/* Duration Selection */}
+                <Typography className="text-blue-gray-400 text-sm mb-3">
+                  Sesuaikan durasi
+                </Typography>
+                <div className="flex gap-2 justify-center flex-wrap">
+                  {durations.map((duration) => (
+                    <Button
+                      key={duration}
+                      onClick={() => handleDurationChange(duration)}
+                      className={`px-4 py-2 text-sm rounded-lg transition ${
+                        timeLeft === duration * 60
+                          ? "bg-lemon border-2 border-black text-black "
+                            : "bg-slate-600 text-black"
+                      }`}
+                    >
+                      {duration}m
+                    </Button>
+                  ))}
+                </div>
+              </CardBody>
+            </Card>
+          </div>
+
+          {/* Right Panel */}
+          <div className="lg:col-grid-2 space-y-6">
+            {/* Session Today */}
+            <Card className="bg-slate-700 border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white">
+              <CardBody>
+                <Typography variant="h6" className="text-blackgray mb-4">
+                  SESI HARI INI
+                </Typography>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <Typography className="text-blue-gray-400">
+                      Sesi Selesai
+                    </Typography>
+                    <Typography className="text-green-400 font-bold">
+                      ✓ {sessionCount}
+                    </Typography>
+                  </div>
+                  <div className="flex justify-between">
+                    <Typography className="text-blue-gray-400">
+                      Total Fokus
+                    </Typography>
+                    <Typography className="text-blue-400 font-bold">
+                      ⏱ {Math.floor((sessionCount * focusModes[focusMode].duration) / 60)}m
+                    </Typography>
+                  </div>
+                  <div className="flex justify-between">
+                    <Typography className="text-blue-gray-400">
+                      Streak Sesi
+                    </Typography>
+                    <Typography className="text-orange-400 font-bold">
+                      🔥 {sessionCount > 0 ? sessionCount : 0}
+                    </Typography>
+                  </div>
+                </div>
+
+                {sessions.length > 0 && (
+                  <div className="mt-4 p-3 bg-teal-950 border border-teal-700 rounded-lg">
+                    <Typography className="text-teal-300 text-sm">
+                       AI: Kamu cocok dengan sesi{" "}
+                      <strong>{sessions.length * 25} menit</strong> berdasarkan
+                      histori fokusmu. Coba hari ini!
+                    </Typography>
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+
+            {/* Learning Material */}
+            <Card className="bg-slate-700 border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white">
+              <CardBody>
+                <Typography variant="h6" className="text-blackgray mb-4">
+                  SEDANG BELAJAR APA?
+                </Typography>
+                <Typography className="text-blue-gray-400 text-sm mb-2">
+                  MATERI SAAT INI
+                </Typography>
+                <Input
+                  placeholder="cth: Bab 3 - Turunan Fungsi"
+                  value={material}
+                  onChange={(e) => setMaterial(e.target.value)}
+                  className="mb-4 bg-slate-600 border-slate-500 text-blackgray focus:outline-none"
+                  
+                />
+
+                <Typography className="text-blue-gray-400 text-sm mb-2">
+                  TARGET SESI INI
+                </Typography>
+                <Input
+                  placeholder="cth: Selesaikan 5 soal latihan"
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
+                  className="bg-slate-600 border-slate-500 text-blackgray focus:outline-none"
+                  
+                />
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+
+        {/* Session History */}
+        {sessions.length > 0 && (
+          <Card className="mt-6 bg-slate-700 border border-black shadow-[8px_8px_0px_rgba(0,0,0,1)]">
+            <CardBody>
+              <Typography variant="h6" className="text-blackgray mb-4">
+                Riwayat Sesi Hari Ini
+              </Typography>
+              <div className="space-y-2">
+                {sessions.map((session, idx) => (
+                  <div
+                    key={session.id}
+                    className="p-3 bg-slate-600 rounded-lg text-blue-gray-300"
+                  >
+                    <Typography className="text-sm">
+                      Sesi {idx + 1}: <strong>{session.material || "Fokus"}</strong>
+                    </Typography>
+                    <Typography className="text-xs text-blue-gray-400">
+                      Target: {session.target || "Menyelesaikan tugas"}
+                    </Typography>
+                  </div>
                 ))}
               </div>
-            </div>
-            <ProfileInfoCard
-              title="Profile Information"
-              description="Hi, I'm Alec Thompson, Decisions: If you can't decide, the answer is no. If two equally difficult paths, choose the one more painful in the short term (pain avoidance is creating an illusion of equality)."
-              details={{
-                "first name": "Alec M. Thompson",
-                mobile: "(44) 123 1234 123",
-                email: "alecthompson@mail.com",
-                location: "USA",
-                social: (
-                  <div className="flex items-center gap-4">
-                    <i className="fa-brands fa-facebook text-blue-700" />
-                    <i className="fa-brands fa-twitter text-blue-400" />
-                    <i className="fa-brands fa-instagram text-purple-500" />
-                  </div>
-                ),
-              }}
-              action={
-                <Tooltip content="Edit Profile">
-                  <PencilIcon className="h-4 w-4 cursor-pointer text-blue-gray-500" />
-                </Tooltip>
-              }
-            />
-            <div>
-              <Typography variant="h6" color="blue-gray" className="mb-3">
-                Platform Settings
-              </Typography>
-              <ul className="flex flex-col gap-6">
-                {conversationsData.map((props) => (
-                  <MessageCard
-                    key={props.name}
-                    {...props}
-                    action={
-                      <Button variant="text" size="sm">
-                        reply
-                      </Button>
-                    }
-                  />
-                ))}
-              </ul>
-            </div>
-          </div>
-          <div className="px-4 pb-4">
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Projects
-            </Typography>
-            <Typography
-              variant="small"
-              className="font-normal text-blue-gray-500"
-            >
-              Architects design houses
-            </Typography>
-            <div className="mt-6 grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-4">
-              {projectsData.map(
-                ({ img, title, description, tag, route, members }) => (
-                  <Card key={title} color="transparent" shadow={false}>
-                    <CardHeader
-                      floated={false}
-                      color="gray"
-                      className="mx-0 mt-0 mb-4 h-64 xl:h-40"
-                    >
-                      <img
-                        src={img}
-                        alt={title}
-                        className="h-full w-full object-cover"
-                      />
-                    </CardHeader>
-                    <CardBody className="py-0 px-1">
-                      <Typography
-                        variant="small"
-                        className="font-normal text-blue-gray-500"
-                      >
-                        {tag}
-                      </Typography>
-                      <Typography
-                        variant="h5"
-                        color="blue-gray"
-                        className="mt-1 mb-2"
-                      >
-                        {title}
-                      </Typography>
-                      <Typography
-                        variant="small"
-                        className="font-normal text-blue-gray-500"
-                      >
-                        {description}
-                      </Typography>
-                    </CardBody>
-                    <CardFooter className="mt-6 flex items-center justify-between py-0 px-1">
-                      <Link to={route}>
-                        <Button variant="outlined" size="sm">
-                          view project
-                        </Button>
-                      </Link>
-                      <div>
-                        {members.map(({ img, name }, key) => (
-                          <Tooltip key={name} content={name}>
-                            <Avatar
-                              src={img}
-                              alt={name}
-                              size="xs"
-                              variant="circular"
-                              className={`cursor-pointer border-2 border-white ${
-                                key === 0 ? "" : "-ml-2.5"
-                              }`}
-                            />
-                          </Tooltip>
-                        ))}
-                      </div>
-                    </CardFooter>
-                  </Card>
-                )
-              )}
-            </div>
-          </div>
-        </CardBody>
-      </Card>
-    </>
+            </CardBody>
+          </Card>
+        )}
+      </div>
+    </div>
   );
 }
 
-export default Profile;
+export default FokusMode;
