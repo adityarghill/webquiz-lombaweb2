@@ -8,8 +8,8 @@ import {
   PuzzlePieceIcon,
   CircleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Tables, FokusMode, Notifications } from "@/pages/dashboard";
-import { SignIn, SignUp } from "@/pages/auth";
+import { Home, Analysis, FokusMode, Notifications } from "@/pages/dashboard";
+import { SignIn, SignUp, ForgotPassword} from "@/pages/auth";
 import PetGame from "@/widgets/game/PetGame";
 
 const icon = {
@@ -34,9 +34,9 @@ export const routes = [
       },
       {
         icon: <TableCellsIcon {...icon} />,
-        name: "tables",
-        path: "/tables",
-        element: <Tables />,
+        name: "Behavior Analysis",
+        path: "/analysis",
+        element: <Analysis />,
       },
       {
         icon: <InformationCircleIcon {...icon} />,
@@ -67,6 +67,12 @@ export const routes = [
         name: "sign up",
         path: "/sign-up",
         element: <SignUp />,
+      },
+      {
+        icon: <InformationCircleIcon {...icon} />,
+        name: "forgot password",
+        path: "/forgot-password",
+        element: <ForgotPassword />,
       },
     ],
   },
