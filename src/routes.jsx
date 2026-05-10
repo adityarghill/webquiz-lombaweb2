@@ -6,11 +6,15 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
   PuzzlePieceIcon,
-  CircleStackIcon,
+  AcademicCapIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Analysis, FokusMode, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp, ForgotPassword} from "@/pages/auth";
 import PetGame from "@/widgets/game/PetGame";
+import QuizList from "@/pages/quiz/QuizList";
+import QuizDetail from "@/pages/quiz/QuizDetail";
+import QuizPlay from "@/pages/quiz/QuizPlay";
+import QuizResult from "@/pages/quiz/QuizResult";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -25,6 +29,12 @@ export const routes = [
         name: "dashboard",
         path: "/home",
         element: <Home />,
+      },
+      {
+        icon: <AcademicCapIcon {...icon} />,
+        name: "quiz",
+        path: "/quiz",
+        element: <QuizList />,
       },
       {
         icon: <TableCellsIcon {...icon} />,
@@ -49,7 +59,8 @@ export const routes = [
         name: "pet space",
         path: "/game",
         element: <PetGame />,
-      }
+      },
+
     ],
   },
   {

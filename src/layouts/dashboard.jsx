@@ -9,13 +9,16 @@ import {
 } from "@/widgets/layout";
 import routes from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
+import QuizDetail from "@/pages/quiz/QuizDetail";
+import QuizPlay from "@/pages/quiz/QuizPlay";
+import QuizResult from "@/pages/quiz/QuizResult";
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType } = controller;
 
   return (
-    <div className="min-h-screen" style={{ background: "#ece161" }}>
+    <div className="min-h-screen" style={{ background: "#ffffff" }}>
       <Sidenav
         routes={routes}
         brandImg={
@@ -35,13 +38,18 @@ export function Dashboard() {
           <Cog6ToothIcon className="h-5 w-5" />
         </IconButton>
         <Routes>
+          {/* Standard nav routes */}
           {routes.map(
             ({ layout, pages }) =>
               layout === "dashboard" &&
               pages.map(({ path, element }) => (
-                <Route exact path={path} element={element} />
+                <Route key={path} exact path={path} element={element} />
               ))
           )}
+          {/* Quiz sub-routes (not in sidenav) */}
+          <Route path="/quiz/:quizId" element={<QuizDetail />} />
+          <Route path="/quiz/:quizId/play" element={<QuizPlay />} />
+          <Route path="/quiz/:quizId/result" element={<QuizResult />} />
         </Routes>
         <div className="text-blue-gray-600">
           <Footer />
