@@ -83,7 +83,7 @@ export function FokusMode() {
           <Typography variant="h2" className="text-blackgray mb-2">
             Pomodoro Smart
           </Typography>
-          <Typography className="text-blue-gray-400">
+          <Typography className="text-black">
             Timer cerdas yang menyesuaikan dirimu
           </Typography>
         </div>
@@ -91,7 +91,7 @@ export function FokusMode() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Panel - Timer */}
           <div className="lg:col-span-1">
-            <Card className="bg-slate-700 border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white">
+            <Card className="bg-slate-700 border-2 border-black rounded-3xl shadow-[6px_5px_0px_rgba(0,0,0,1)] bg-white">
               <CardBody className="text-center">
                 {/* Focus Modes */}
                 <div className="flex gap-3 justify-center mb-6">
@@ -157,7 +157,7 @@ export function FokusMode() {
                       </Typography>
                     </div>
                   </div>
-                  <Typography className="text-blue-gray-400 uppercase tracking-wider">
+                  <Typography className="text-black uppercase tracking-wider">
                     {focusModes[focusMode].name}
                   </Typography>
                 </div>
@@ -183,7 +183,7 @@ export function FokusMode() {
                 </div>
 
                 {/* Duration Selection */}
-                <Typography className="text-blue-gray-400 text-sm mb-3">
+                <Typography className="text-black text-sm mb-3">
                   Sesuaikan durasi
                 </Typography>
                 <div className="flex gap-2 justify-center flex-wrap">
@@ -208,14 +208,14 @@ export function FokusMode() {
           {/* Right Panel */}
           <div className="lg:col-grid-2 space-y-6">
             {/* Session Today */}
-            <Card className="bg-slate-700 border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white">
+            <Card className="bg-slate-700 border-2 border-black rounded-3xl shadow-[6px_5px_0px_rgba(0,0,0,1)] bg-white">
               <CardBody>
-                <Typography variant="h6" className="text-blackgray mb-4">
+                <Typography variant="h6" className="text-black mb-4">
                   SESI HARI INI
                 </Typography>
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <Typography className="text-blue-gray-400">
+                    <Typography className="text-black">
                       Sesi Selesai
                     </Typography>
                     <Typography className="text-green-400 font-bold">
@@ -223,7 +223,7 @@ export function FokusMode() {
                     </Typography>
                   </div>
                   <div className="flex justify-between">
-                    <Typography className="text-blue-gray-400">
+                    <Typography className="text-black">
                       Total Fokus
                     </Typography>
                     <Typography className="text-blue-400 font-bold">
@@ -231,7 +231,7 @@ export function FokusMode() {
                     </Typography>
                   </div>
                   <div className="flex justify-between">
-                    <Typography className="text-blue-gray-400">
+                    <Typography className="text-black">
                       Streak Sesi
                     </Typography>
                     <Typography className="text-orange-400 font-bold">
@@ -253,31 +253,38 @@ export function FokusMode() {
             </Card>
 
             {/* Learning Material */}
-            <Card className="bg-slate-700 border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white">
+            <Card className="bg-white border-2 border-black rounded-3xl shadow-[6px_5px_0px_#000]">
               <CardBody>
-                <Typography variant="h6" className="text-blackgray mb-4">
+                <Typography variant="h6" className="text-black mb-4 font-bold">
                   SEDANG BELAJAR APA?
                 </Typography>
-                <Typography className="text-blue-gray-400 text-sm mb-2">
+
+                <Typography className="text-black text-sm mb-2 font-medium">
                   MATERI SAAT INI
                 </Typography>
+
                 <Input
                   placeholder="cth: Bab 3 - Turunan Fungsi"
                   value={material}
                   onChange={(e) => setMaterial(e.target.value)}
-                  className="mb-4 bg-slate-600 border-slate-500 text-blackgray focus:outline-none"
-                  
+                  className="!bg-gray-50 !border-gray-300 !text-black placeholder-gray-500"
+                  labelProps={{
+                    className: "hidden",
+                  }}
                 />
 
-                <Typography className="text-blue-gray-400 text-sm mb-2">
+                <Typography className="text-black text-sm mt-2 mb-2 font-medium">
                   TARGET SESI INI
                 </Typography>
+
                 <Input
                   placeholder="cth: Selesaikan 5 soal latihan"
                   value={target}
                   onChange={(e) => setTarget(e.target.value)}
-                  className="bg-slate-600 border-slate-500 text-blackgray focus:outline-none"
-                  
+                  className="!bg-gray-50 !border-gray-300 !text-black placeholder-gray-500"
+                  labelProps={{
+                    className: "hidden",
+                  }}
                 />
               </CardBody>
             </Card>
@@ -300,7 +307,7 @@ export function FokusMode() {
                     <Typography className="text-sm">
                       Sesi {idx + 1}: <strong>{session.material || "Fokus"}</strong>
                     </Typography>
-                    <Typography className="text-xs text-blue-gray-400">
+                    <Typography className="text-xs text-black">
                       Target: {session.target || "Menyelesaikan tugas"}
                     </Typography>
                   </div>

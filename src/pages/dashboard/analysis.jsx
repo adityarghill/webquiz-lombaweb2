@@ -34,7 +34,7 @@ const weeklyPattern = [
   { day: 'Minggu', productivity: 30, status: 'Kurang Aktif', color: 'bg-red-500' },
 ];
 
-export const Tables = () => {
+export const Analysis = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 text-black">
       <h1 className="text-3xl font-bold mb-2">Behavior Analysis</h1>
@@ -42,7 +42,7 @@ export const Tables = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Heatmap Aktivitas */}
-        <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg">
+        <div className="border-2 border-black rounded-3xl shadow-[6px_5px_0px_rgba(0,0,0,1)] bg-white p-6">
           <div className="flex items-center mb-4">
             <div className="w-4 h-4 bg-purple-500 rounded-full mr-2"></div>
             <h2 className="text-lg font-semibold">HEATMAP AKTIVITAS</h2>
@@ -65,7 +65,7 @@ export const Tables = () => {
         </div>
 
         {/* Jam Paling Produktif */}
-        <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg">
+        <div className="border-2 border-black rounded-3xl shadow-[6px_5px_0px_rgba(0,0,0,1)] bg-white p-6">
           <div className="flex items-center mb-4">
             <div className="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
             <h2 className="text-lg font-semibold">JAM PALING PRODUKTIF</h2>
@@ -93,7 +93,7 @@ export const Tables = () => {
       </div>
 
       {/* Pola Minggu */}
-      <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg mb-8">
+      <div className="border-2 border-black rounded-3xl shadow-[6px_5px_0px_rgba(0,0,0,1)] bg-white p-6 mb-8">
         <div className="flex items-center mb-4">
           <div className="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
           <h2 className="text-lg font-semibold">POLA MINGGU - KAPAN KAMU PRODUKTIF?</h2>
@@ -117,7 +117,7 @@ export const Tables = () => {
       </div>
 
       {/* Laporan AI Mingguan */}
-      <div className="border-2 border-black shadow-[8px_8px_0px_rgba(0,0,0,1)] bg-white p-6 rounded-lg">
+      <div className="border-2 border-black rounded-3xl shadow-[6px_5px_0px_rgba(0,0,0,1)] bg-white p-6">
         <div className="flex items-center mb-4">
           <div className="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
           <h2 className="text-lg font-semibold">LAPORAN AI MINGGUAN</h2>

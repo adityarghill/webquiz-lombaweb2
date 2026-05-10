@@ -1,124 +1,172 @@
-import {
-  Card,
-  Input,
-  Checkbox,
-  Button,
-  Typography,
-} from "@material-tailwind/react";
-import { Link } from "react-router-dom";
-
+import { Input, Button, Typography } from "@material-tailwind/react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "../../context/authContext";
 
 export function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const { signIn, resendVerificationEmail } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
+    setLoading(true);
+
+    const { data, error } = await signIn(email, password);
+    
+    if (error) {
+      setErrorMsg(error);
+      setLoading(false);
+    } else {
+      setSuccessMsg("Sign in successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/dashboard/home");
+      }, 1500);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) {
+      setErrorMsg("Please enter your email address");
+      return;
+    }
+
+    setResendingEmail(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const { data, error } = await resendVerificationEmail(email);
+
+    if (error) {
+      setErrorMsg(error);
+    } else {
+      setSuccessMsg("Verification email sent! Check your inbox.");
+    }
+    setResendingEmail(false);
+  };
+
   return (
-    <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-3/5 mt-24">
-        <div className="text-center">
-          <Typography variant="h2" className="font-bold mb-4">Sign In</Typography>
-          <Typography variant="paragraph" color="blue-gray" className="text-lg font-normal">Enter your email and password to Sign In.</Typography>
-        </div>
-        <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
-          <div className="mb-1 flex flex-col gap-6">
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Your email
+    <section className="min-h-screen flex items-center justify-center p-4" style={{ background: "#ece161" }}>
+      {/* Main Container */}
+      <div className="w-full max-w-md ">
+        {/* Card Container */}
+        <div className="bg-white border-4 border-black p-8 rounded-3xl shadow-[8px_7px_0px_rgba(0,0,0,1)]">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <Typography variant="h3" className="text-black font-bold mb-2">
+              Welcome Back
             </Typography>
-            <Input
-              size="lg"
-              placeholder="name@mail.com"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
-            <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
-              Password
+            <Typography variant="paragraph" className="text-gray-600 text-sm">
+              Please sign in to your account
             </Typography>
-            <Input
-              type="password"
-              size="lg"
-              placeholder="********"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
           </div>
-          <Checkbox
-            label={
-              <Typography
-                variant="small"
-                color="gray"
-                className="flex items-center justify-start font-medium"
+
+          {/* Error Message */}
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+              <div>{errorMsg}</div>
+              {errorMsg.includes("verify your email") && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  className="mt-2 text-blue-600 hover:text-blue-700 font-medium underline text-left"
+                  disabled={resendingEmail}
+                >
+                  {resendingEmail ? "Sending..." : "Resend verification email"}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Success Message */}
+          {successMsg && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
+              {successMsg}
+            </div>
+          )}
+
+          {/* Form */}
+          <form className="space-y-4" onSubmit={handleSignIn}>
+            {/* Email Field */}
+            <div>
+              <label className="block text-black text-sm font-medium mb-2">
+                Email address
+              </label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="!bg-gray-50 !border-gray-300 !text-black placeholder-gray-500"
+                labelProps={{
+                  className: "before:content-none after:content-none",
+                }}
+                disabled={loading}
+              />
+            </div>
+
+            {/* Password Field */}
+            <div>
+              <label className="block text-black text-sm font-medium mb-2">
+                Password
+              </label>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="!bg-gray-50 !border-gray-300 !text-black placeholder-gray-500"
+                labelProps={{
+                  className: "before:content-none after:content-none",
+                }}
+                disabled={loading}
+              />
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link to="/auth/forgot-password" className="text-blue-600 hover:text-blue-700 text-sm font-medium transition">
+                Forgot password?
+              </Link>
+            </div>
+
+            {/* Sign In Button */}
+            <Button
+              type="submit"
+              className={`w-full h-12 mt-6 rounded-md border-2 border-black p-2.5 font-semibold transition-all !shadow-none hover:!shadow-[2px_2px_0px_#000] ${
+                email && password && !loading
+                    ? "bg-white text-black"
+                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
+              }`}
+              size="lg"
+              disabled={!email || !password || loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+
+          {/* Footer Links */}
+          <div className="mt-6 text-center">
+            <Typography variant="small" className="text-gray-600">
+              Don't have an account?{" "}
+              <Link
+                to="/auth/sign-up"
+                className="text-blue-600 hover:text-blue-700 font-medium transition"
               >
-                I agree the&nbsp;
-                <a
-                  href="#"
-                  className="font-normal text-black transition-colors hover:text-gray-900 underline"
-                >
-                  Terms and Conditions
-                </a>
-              </Typography>
-            }
-            containerProps={{ className: "-ml-2.5" }}
-          />
-          <Button className="mt-6" fullWidth>
-            Sign In
-          </Button>
-
-          <div className="flex items-center justify-between gap-2 mt-6">
-            <Checkbox
-              label={
-                <Typography
-                  variant="small"
-                  color="gray"
-                  className="flex items-center justify-start font-medium"
-                >
-                  Subscribe me to newsletter
-                </Typography>
-              }
-              containerProps={{ className: "-ml-2.5" }}
-            />
-            <Typography variant="small" className="font-medium text-gray-900">
-              <a href="#">
-                Forgot Password
-              </a>
+                Sign up
+              </Link>
             </Typography>
           </div>
-          <div className="space-y-4 mt-8">
-            <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
-              <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <g clipPath="url(#clip0_1156_824)">
-                  <path d="M16.3442 8.18429C16.3442 7.64047 16.3001 7.09371 16.206 6.55872H8.66016V9.63937H12.9813C12.802 10.6329 12.2258 11.5119 11.3822 12.0704V14.0693H13.9602C15.4741 12.6759 16.3442 10.6182 16.3442 8.18429Z" fill="#4285F4" />
-                  <path d="M8.65974 16.0006C10.8174 16.0006 12.637 15.2922 13.9627 14.0693L11.3847 12.0704C10.6675 12.5584 9.7415 12.8347 8.66268 12.8347C6.5756 12.8347 4.80598 11.4266 4.17104 9.53357H1.51074V11.5942C2.86882 14.2956 5.63494 16.0006 8.65974 16.0006Z" fill="#34A853" />
-                  <path d="M4.16852 9.53356C3.83341 8.53999 3.83341 7.46411 4.16852 6.47054V4.40991H1.51116C0.376489 6.67043 0.376489 9.33367 1.51116 11.5942L4.16852 9.53356Z" fill="#FBBC04" />
-                  <path d="M8.65974 3.16644C9.80029 3.1488 10.9026 3.57798 11.7286 4.36578L14.0127 2.08174C12.5664 0.72367 10.6469 -0.0229773 8.65974 0.000539111C5.63494 0.000539111 2.86882 1.70548 1.51074 4.40987L4.1681 6.4705C4.8001 4.57449 6.57266 3.16644 8.65974 3.16644Z" fill="#EA4335" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_1156_824">
-                    <rect width="16" height="16" fill="white" transform="translate(0.5)" />
-                  </clipPath>
-                </defs>
-              </svg>
-              <span>Sign in With Google</span>
-            </Button>
-            <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
-              <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
-              <span>Sign in With Twitter</span>
-            </Button>
-          </div>
-          <Typography variant="paragraph" className="text-center text-blue-gray-500 font-medium mt-4">
-            Not registered?
-            <Link to="/auth/sign-up" className="text-gray-900 ml-1">Create account</Link>
-          </Typography>
-        </form>
+        </div>
 
       </div>
-      <div className="w-2/5 h-full hidden lg:block">
-        <img
-          src="/img/pattern.png"
-          className="h-full w-full object-cover rounded-3xl"
-        />
-      </div>
-
     </section>
   );
 }
