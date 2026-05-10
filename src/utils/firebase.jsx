@@ -2,12 +2,12 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDNImTX-E1CGfjnYe7RQce4qmnZZGyh6uo",
-  authDomain: "webquiz-6a879.firebaseapp.com",
-  projectId: "webquiz-6a879",
-  storageBucket: "webquiz-6a879.firebasestorage.app",
-  messagingSenderId: "745987209228",
-  appId: "1:745987209228:web:6264743a57e9d6536ed629",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
