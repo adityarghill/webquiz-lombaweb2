@@ -33,6 +33,7 @@ export function QuizResult() {
   const {
     score = 0, total = 10, expEarned = 0,
     timeTaken = 0, answers = {}, questions = [], quiz = {},
+    savedToCloud = false,
   } = location.state || {};
 
   const isPerfect = score === total;
@@ -48,6 +49,38 @@ export function QuizResult() {
 
   return (
     <div style={{ marginTop: 36, paddingBottom: 64, maxWidth: 680, margin: "36px auto 64px" }}>
+
+      {/* ── Cloud save notice ── */}
+      {savedToCloud ? (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8, marginBottom: 16,
+          padding: "10px 16px", borderRadius: 12, border: "2px solid #22C55E",
+          background: "#F0FDF4", boxShadow: "3px 3px 0 #16A34A",
+        }}>
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/>
+          </svg>
+          <span style={{ fontSize: 13, fontWeight: 800, color: "#15803D" }}>
+            Progress tersimpan ke akunmu ✓
+          </span>
+        </div>
+      ) : (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8, marginBottom: 16,
+          padding: "10px 16px", borderRadius: 12, border: "2px solid #F59E0B",
+          background: "#FFFBEB", boxShadow: "3px 3px 0 #D97706",
+        }}>
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+          <span style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>
+            Kamu belum login — hasil quiz tidak tersimpan.{" "}
+            <a href="/material-tailwind-dashboard-react/auth/sign-in" style={{ color: "#1D4ED8", textDecoration: "underline" }}>
+              Login untuk simpan progress
+            </a>
+          </span>
+        </div>
+      )}
 
       {/* ── Hero result card ── */}
       <div style={{

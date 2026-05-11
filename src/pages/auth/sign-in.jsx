@@ -27,7 +27,7 @@ export function SignIn() {
     } else {
       setSuccessMsg("Sign in successful! Redirecting...");
       setTimeout(() => {
-        navigate("/dashboard/home");
+        navigate("/dashboard/quiz");
       }, 1500);
     }
   };

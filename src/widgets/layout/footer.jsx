@@ -17,7 +17,7 @@ export function Footer({ brandName, brandLink, routes }) {
           >
             {brandName}
           </a>{" "}
-          AA Project.
+          Lalalemon Team.
         </Typography>
       </div>
     </footer>

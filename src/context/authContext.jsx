@@ -8,107 +8,117 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { auth } from '../utils/firebase';
+import { supabase } from '../utils/supabase';
 
 const AuthContext = createContext(null);
 
-// Rate limiting for token verifications
 const RateLimiter = {
   attempts: {},
   maxAttempts: 5,
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  
+  windowMs: 15 * 60 * 1000,
   isLimited: (key) => {
     const now = Date.now();
-    if (!RateLimiter.attempts[key]) {
-      RateLimiter.attempts[key] = [];
-    }
-    
-    // Remove old attempts outside the window
-    RateLimiter.attempts[key] = RateLimiter.attempts[key].filter(
-      (time) => now - time < RateLimiter.windowMs
-    );
-    
+    if (!RateLimiter.attempts[key]) RateLimiter.attempts[key] = [];
+    RateLimiter.attempts[key] = RateLimiter.attempts[key].filter((t) => now - t < RateLimiter.windowMs);
     return RateLimiter.attempts[key].length >= RateLimiter.maxAttempts;
   },
-  
   recordAttempt: (key) => {
-    if (!RateLimiter.attempts[key]) {
-      RateLimiter.attempts[key] = [];
-    }
+    if (!RateLimiter.attempts[key]) RateLimiter.attempts[key] = [];
     RateLimiter.attempts[key].push(Date.now());
   },
-  
   getRemainingTime: (key) => {
-    if (!RateLimiter.attempts[key] || RateLimiter.attempts[key].length === 0) {
-      return 0;
-    }
-    const oldestAttempt = RateLimiter.attempts[key][0];
-    const remainingMs = RateLimiter.windowMs - (Date.now() - oldestAttempt);
-    return Math.ceil(remainingMs / 1000 / 60); // Convert to minutes
+    if (!RateLimiter.attempts[key]?.length) return 0;
+    return Math.ceil((RateLimiter.windowMs - (Date.now() - RateLimiter.attempts[key][0])) / 60000);
   },
 };
 
+async function syncUserToSupabase(firebaseUser) {
+  if (!firebaseUser) return;
+  const { uid, email, displayName } = firebaseUser;
+  try {
+    const { error: profileErr } = await supabase
+      .from('user_profiles')
+      .upsert(
+        { firebase_uid: uid, email, display_name: displayName || email?.split('@')[0] || 'User', last_seen_at: new Date().toISOString() },
+        { onConflict: 'firebase_uid' }
+      );
+    if (profileErr) console.error('[Auth] user_profiles upsert:', profileErr.message);
+
+    const { data: existing } = await supabase.from('user_stats').select('firebase_uid').eq('firebase_uid', uid).maybeSingle();
+    if (!existing) {
+      const { error: statsErr } = await supabase.from('user_stats').insert({ firebase_uid: uid, total_exp: 0, quizzes_completed: 0, perfect_scores: 0 });
+      if (statsErr) console.error('[Auth] user_stats insert:', statsErr.message);
+    }
+  } catch (err) {
+    console.error('[Auth] syncUserToSupabase:', err.message);
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [userStats, setUserStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check user session on mount
+  const fetchUserStats = async (uid) => {
+    if (!uid) { setUserStats(null); return; }
+    const { data } = await supabase.from('user_stats').select('total_exp, quizzes_completed, perfect_scores').eq('firebase_uid', uid).maybeSingle();
+    setUserStats(data || { total_exp: 0, quizzes_completed: 0, perfect_scores: 0 });
+  };
+
+  const refreshUserStats = () => { if (user?.uid) fetchUserStats(user.uid); };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser || null);
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser?.emailVerified) {
+        await syncUserToSupabase(firebaseUser);
+        setUser(firebaseUser);
+        fetchUserStats(firebaseUser.uid);
+      } else {
+        setUser(null);
+        setUserStats(null);
+      }
       setLoading(false);
     });
-
-    return unsubscribe;
+    return unsub;
   }, []);
 
   const signUp = async (email, password) => {
     try {
       setError(null);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      
-      // Sign out the user (they need to verify email first)
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(cred.user);
       await firebaseSignOut(auth);
       setUser(null);
-      
-      return { 
-        data: { user, message: 'Verification email sent. Please check your email.' }, 
-        error: null 
-      };
+      return { data: { user: cred.user, message: 'Email verifikasi telah dikirim.' }, error: null };
     } catch (err) {
-      const errorMsg = err.message || 'Sign up failed';
-      setError(errorMsg);
-      return { data: null, error: errorMsg };
+      const msg = err.message || 'Sign up gagal';
+      setError(msg);
+      return { data: null, error: msg };
     }
   };
 
   const signIn = async (email, password) => {
     try {
       setError(null);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      // Reload user to get latest emailVerified status
-      await user.reload();
-      
-      if (!user.emailVerified) {
-        // Sign out if email not verified
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = cred.user;
+      await firebaseUser.reload();
+      if (!firebaseUser.emailVerified) {
         await firebaseSignOut(auth);
         setUser(null);
-        const errorMsg = 'Please verify your email before signing in. Check your inbox for the verification link.';
-        setError(errorMsg);
-        return { data: null, error: errorMsg };
+        const msg = 'Email belum diverifikasi. Cek inbox kamu.';
+        setError(msg);
+        return { data: null, error: msg };
       }
-      
-      setUser(user);
-      return { data: { user }, error: null };
+      await syncUserToSupabase(firebaseUser);
+      setUser(firebaseUser);
+      await fetchUserStats(firebaseUser.uid);
+      return { data: { user: firebaseUser }, error: null };
     } catch (err) {
-      const errorMsg = err.message || 'Sign in failed';
-      setError(errorMsg);
-      return { data: null, error: errorMsg };
+      const msg = err.message || 'Sign in gagal';
+      setError(msg);
+      return { data: null, error: msg };
     }
   };
 
@@ -117,84 +127,61 @@ export function AuthProvider({ children }) {
       setError(null);
       await firebaseSignOut(auth);
       setUser(null);
+      setUserStats(null);
       return { error: null };
     } catch (err) {
-      const errorMsg = err.message || 'Sign out failed';
-      setError(errorMsg);
-      return { error: errorMsg };
+      const msg = err.message || 'Sign out gagal';
+      setError(msg);
+      return { error: msg };
     }
   };
 
   const resetPassword = async (email) => {
-    const rateLimitKey = `reset_${email}`;
-    
-    // Check rate limit
-    if (RateLimiter.isLimited(rateLimitKey)) {
-      const remainingTime = RateLimiter.getRemainingTime(rateLimitKey);
-      const errorMsg = `Too many password reset requests. Please try again in ${remainingTime} minute${remainingTime > 1 ? 's' : ''}`;
-      setError(errorMsg);
-      return { data: null, error: errorMsg };
+    const key = `reset_${email}`;
+    if (RateLimiter.isLimited(key)) {
+      const t = RateLimiter.getRemainingTime(key);
+      const msg = `Terlalu banyak permintaan. Coba lagi dalam ${t} menit.`;
+      setError(msg);
+      return { data: null, error: msg };
     }
-    
     try {
       setError(null);
-      RateLimiter.recordAttempt(rateLimitKey);
-      
-      // Send password reset email
+      RateLimiter.recordAttempt(key);
       await sendPasswordResetEmail(auth, email, {
         url: `${window.location.origin}/material-tailwind-dashboard-react/auth/sign-in`,
         handleCodeInApp: true,
       });
-      
-      return { data: { message: 'Password reset email sent. Check your email.' }, error: null };
+      return { data: { message: 'Email reset password telah dikirim.' }, error: null };
     } catch (err) {
-      const errorMsg = err.message || 'Password reset request failed';
-      setError(errorMsg);
-      return { data: null, error: errorMsg };
+      const msg = err.message || 'Reset gagal';
+      setError(msg);
+      return { data: null, error: msg };
     }
   };
 
-  const resendVerificationEmail = async (email) => {
+  const resendVerificationEmail = async () => {
     try {
       setError(null);
-      // Get the user by email to resend verification
-      const user = auth.currentUser;
-      
-      if (!user) {
-        throw new Error('User not found');
-      }
-      
-      
-      return { data: { message: 'Verification email resent. Check your email.' }, error: null };
+      const cu = auth.currentUser;
+      if (!cu) throw new Error('User tidak ditemukan');
+      await sendEmailVerification(cu);
+      return { data: { message: 'Email verifikasi dikirim ulang.' }, error: null };
     } catch (err) {
-      const errorMsg = err.message || 'Failed to resend verification email';
-      setError(errorMsg);
-      return { data: null, error: errorMsg };
+      const msg = err.message || 'Gagal kirim ulang';
+      setError(msg);
+      return { data: null, error: msg };
     }
-  };
-
-  const value = {
-    user,
-    loading,
-    error,
-    signUp,
-    signIn,
-    signOut,
-    resetPassword,
-    resendVerificationEmail,
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, userStats, loading, error, signUp, signIn, signOut, resetPassword, resendVerificationEmail, refreshUserStats }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth harus digunakan di dalam AuthProvider');
+  return ctx;
 }

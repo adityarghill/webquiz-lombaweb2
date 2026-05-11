@@ -10,7 +10,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, Analysis, FokusMode } from "@/pages/dashboard";
 import { SignIn, SignUp, ForgotPassword} from "@/pages/auth";
-import PetGame from "@/widgets/game/PetGame";
+import PetGameWithAuth from "@/widgets/game/PetGameWithAuth";
 import QuizList from "@/pages/quiz/QuizList";
 
 const icon = {
@@ -43,34 +43,34 @@ export const routes = [
         icon: <PuzzlePieceIcon {...icon} />,
         name: "pet space",
         path: "/game",
-        element: <PetGame />,
+        element: <PetGameWithAuth />,
       },
     ],
   },
-  // {
-  //   title: "auth pages",
-  //   layout: "auth",
-  //   pages: [
-  //     {
-  //       icon: <ServerStackIcon {...icon} />,
-  //       name: "sign in",
-  //       path: "/sign-in",
-  //       element: <SignIn />,
-  //     },
-  //     {
-  //       icon: <RectangleStackIcon {...icon} />,
-  //       name: "sign up",
-  //       path: "/sign-up",
-  //       element: <SignUp />,
-  //     },
-  //     {
-  //       icon: <InformationCircleIcon {...icon} />,
-  //       name: "forgot password",
-  //       path: "/forgot-password",
-  //       element: <ForgotPassword />,
-  //     },
-  //   ],
-  // },
+   {
+     title: "auth pages",
+     layout: "auth",
+     pages: [
+       {
+         icon: <ServerStackIcon {...icon} />,
+         name: "sign in",
+         path: "/sign-in",
+         element: <SignIn />,
+       },
+       {
+         icon: <RectangleStackIcon {...icon} />,
+         name: "sign up",
+         path: "/sign-up",
+         element: <SignUp />,
+       },
+       {
+         icon: <InformationCircleIcon {...icon} />,
+         name: "forgot password",
+         path: "/forgot-password",
+         element: <ForgotPassword />,
+       },
+     ],
+   },
 ];
 
 export default routes;
