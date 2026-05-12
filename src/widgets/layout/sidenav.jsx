@@ -1,15 +1,29 @@
 import PropTypes from "prop-types";
-import { Link, NavLink } from "react-router-dom";
-import { XMarkIcon, LightBulbIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import {
+  XMarkIcon,
+  LightBulbIcon,
+  ChartBarIcon,
+  ArrowRightOnRectangleIcon,
+  ArrowLeftOnRectangleIcon,
+} from "@heroicons/react/24/outline";
 import { Button, IconButton, Typography } from "@material-tailwind/react";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
-
+import { useAuth } from "@/context/authContext";
 
 const isAuthPage = (pageName) => {
-  const authKeywords = ["sign in", "sign up", "login", "register", "forgot password", "lupa password"];
-  return authKeywords.some(keyword => pageName.toLowerCase().includes(keyword));
+  const authKeywords = [
+    "sign in",
+    "sign up",
+    "login",
+    "register",
+    "forgot password",
+    "lupa password",
+  ];
+  return authKeywords.some((keyword) =>
+    pageName.toLowerCase().includes(keyword)
+  );
 };
-
 
 const getCustomIcon = (pageName, defaultIcon) => {
   const name = pageName.toLowerCase();
@@ -21,23 +35,31 @@ const getCustomIcon = (pageName, defaultIcon) => {
 export function Sidenav({ routes }) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { openSidenav } = controller;
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
- 
   const cartoonyShadow = "shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]";
   const cartoonyBorder = "border-4 border-black";
   const buttonShadow = "shadow-[4px_4px_0px_0px_black]";
   const buttonHover = "hover:shadow-[2px_2px_0px_0px_black] hover:translate-y-0.5";
   const buttonActive = "active:translate-y-1 active:shadow-[1px_1px_0px_0px_black]";
 
-  
-  const filteredRoutes = routes.map(route => ({
-    ...route,
-    pages: route.pages?.filter(page => !isAuthPage(page.name)) || []
-  })).filter(route => route.pages.length > 0 || !route.title);
+  const filteredRoutes = routes
+    .map((route) => ({
+      ...route,
+      pages: route.pages?.filter((page) => !isAuthPage(page.name)) || [],
+    }))
+    .filter((route) => route.pages.length > 0 || !route.title);
+
+  const handleSignOut = async () => {
+    await signOut();
+    setOpenSidenav(dispatch, false);
+    navigate("/auth/sign-in");
+  };
 
   return (
     <>
-      
+      {/* Backdrop overlay for mobile */}
       {openSidenav && (
         <div
           onClick={() => setOpenSidenav(dispatch, false)}
@@ -70,7 +92,8 @@ export function Sidenav({ routes }) {
           >
             Belajar dengan Quiz seru, hilangkan bosanmu!
           </Typography>
-          {/* Close button - now properly anchored inside sidebar */}
+
+          {/* Close button (mobile only) */}
           <IconButton
             variant="text"
             size="sm"
@@ -78,7 +101,7 @@ export function Sidenav({ routes }) {
             className="absolute right-2 top-2 h-8 w-8 rounded-lg bg-white border-2 border-black shadow-[3px_3px_0px_0px_black] hover:translate-y-0.5 active:translate-y-1 active:shadow-[1px_1px_0px_0px_black] transition-all xl:hidden"
             onClick={() => setOpenSidenav(dispatch, false)}
           >
-            <XMarkIcon strokeWidth={3} className="h-5 w-5 stroke-black font-bold" />
+            <XMarkIcon strokeWidth={3} className="h-5 w-5 stroke-black" />
           </IconButton>
         </div>
 
@@ -110,9 +133,10 @@ export function Sidenav({ routes }) {
                             transition-all duration-150 ease-in
                             ${buttonShadow} ${buttonHover} ${buttonActive}
                             rounded-xl border-2 border-black
-                            ${isActive 
-                              ? "bg-yellow-400 text-black shadow-[4px_4px_0px_0px_black] hover:bg-yellow-500" 
-                              : "bg-white text-black hover:bg-gray-100"
+                            ${
+                              isActive
+                                ? "bg-yellow-400 text-black shadow-[4px_4px_0px_0px_black] hover:bg-yellow-500"
+                                : "bg-white text-black hover:bg-gray-100"
                             }
                           `}
                         >
@@ -128,6 +152,56 @@ export function Sidenav({ routes }) {
               })}
             </ul>
           ))}
+        </div>
+
+        {/* Auth Section */}
+        <div className="border-t-4 border-black px-4 py-4 flex flex-col gap-2">
+          {user ? (
+            <>
+              <Typography
+                variant="small"
+                className="font-black uppercase tracking-wider text-black/70 text-center text-xs mb-2"
+              >
+                👤 {user.email?.split("@")[0]}
+              </Typography>
+              <Button
+                ripple={false}
+                fullWidth
+                onClick={handleSignOut}
+                className={`
+                  flex items-center justify-center gap-3 px-4 py-3 font-extrabold tracking-wide
+                  transition-all duration-150 ease-in
+                  ${buttonShadow} ${buttonHover} ${buttonActive}
+                  rounded-xl border-2 border-black bg-red-500
+                  text-black hover:bg-red-700
+                `}
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                <Typography color="inherit" className="font-black uppercase">
+                  Sign Out
+                </Typography>
+              </Button>
+            </>
+          ) : (
+            <Link to="/auth/sign-in">
+              <Button
+                ripple={false}
+                fullWidth
+                className={`
+                  flex items-center justify-center gap-3 px-4 py-3 font-extrabold tracking-wide
+                  transition-all duration-150 ease-in
+                  ${buttonShadow} ${buttonHover} ${buttonActive}
+                  rounded-xl border-2 border-black bg-green-500
+                  text-black hover:bg-green-700
+                `}
+              >
+                <ArrowLeftOnRectangleIcon className="h-5 w-5" />
+                <Typography color="inherit" className="font-black uppercase">
+                  Sign In
+                </Typography>
+              </Button>
+            </Link>
+          )}
         </div>
       </aside>
     </>

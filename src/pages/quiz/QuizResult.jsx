@@ -26,7 +26,7 @@ function getGrade(pct, isPerfect) {
 }
 
 export function QuizResult() {
-  const { quizId } = useParams();
+  const { quizSlug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -75,7 +75,7 @@ export function QuizResult() {
           </svg>
           <span style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>
             Kamu belum login — hasil quiz tidak tersimpan.{" "}
-            <a href="/material-tailwind-dashboard-react/auth/sign-in" style={{ color: "#1D4ED8", textDecoration: "underline" }}>
+            <a href="/zooask/auth/sign-in" style={{ color: "#1D4ED8", textDecoration: "underline" }}>
               Login untuk simpan progress
             </a>
           </span>
@@ -273,7 +273,7 @@ export function QuizResult() {
           Back Home
         </button>
         <button
-          onClick={() => navigate(`/dashboard/quiz/${quizId}`)}
+          onClick={() => navigate(`/dashboard/quiz/${quizSlug}`)}
           style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 9,
             padding: "14px", borderRadius: 14, border: BD, background: "#FFE566",
             fontWeight: 900, fontSize: 13, color: "#111", cursor: "pointer",

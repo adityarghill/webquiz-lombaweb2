@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-const BASE_URL = "/material-tailwind-dashboard-react/";
+const BASE_URL = "/zooask/";
 
 
 function rewritePublicPaths() {

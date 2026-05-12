@@ -7,6 +7,8 @@ import {
   RectangleStackIcon,
   PuzzlePieceIcon,
   AcademicCapIcon,
+  LightBulbIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Analysis, FokusMode } from "@/pages/dashboard";
 import { SignIn, SignUp, ForgotPassword} from "@/pages/auth";
@@ -28,13 +30,13 @@ export const routes = [
         element: <QuizList />,
       },
       {
-        icon: <TableCellsIcon {...icon} />,
+        icon: <LightBulbIcon {...icon} />,
         name: "Fokus Mode",
         path: "/focus-mode",
         element: <FokusMode />,
       },
       {
-        icon: <TableCellsIcon {...icon} />,
+        icon: <ChartBarIcon {...icon} />,
         name: "Behavior Analysis",
         path: "/analysis",
         element: <Analysis />,

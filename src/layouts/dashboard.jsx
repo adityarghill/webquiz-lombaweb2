@@ -1,22 +1,19 @@
 import { Routes, Route } from "react-router-dom";
-import { Cog6ToothIcon } from "@heroicons/react/24/solid";
-import { IconButton } from "@material-tailwind/react";
 import {
-  Sidenav,
-  DashboardNavbar,
-  Configurator,
-  Footer,
+  Sidenav, DashboardNavbar, Footer,
 } from "@/widgets/layout";
 import routes from "@/routes";
-import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
+import { useMaterialTailwindController } from "@/context";
 import QuizDetail from "@/pages/quiz/QuizDetail";
 import QuizPlay   from "@/pages/quiz/QuizPlay";
 import QuizResult from "@/pages/quiz/QuizResult";
 
-// ── MusicProvider lives at layout level, NOT inside any route ──
-// This means the audio <Audio> singleton never gets destroyed
-// when the user switches sidenav tabs. Music keeps playing.
+// ── Music singleton (survives tab navigation) ──────────────────────────────
 import { MusicProvider } from "@/context/MusicContext";
+
+// ── Focus timer singleton (survives tab navigation) ────────────────────────
+import { FokusProvider }    from "@/context/FokusContext";
+import FokusFloatingBar     from "@/widgets/layout/FokusFloatingBar";
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -24,42 +21,38 @@ export function Dashboard() {
 
   return (
     <MusicProvider>
-      <div className="min-h-screen" style={{ background: "#eee025" }}>
-        <Sidenav
-          routes={routes}
-          brandImg={
-            sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
-          }
-        />
-        <div className="p-4 xl:ml-80">
-          <DashboardNavbar />
-          <Configurator />
-          <IconButton
-            size="lg"
-            color="white"
-            className="fixed bottom-8 right-8 z-40 rounded-full shadow-blue-gray-900/10"
-            ripple={false}
-            onClick={() => setOpenConfigurator(dispatch, true)}
-          >
-            <Cog6ToothIcon className="h-5 w-5" />
-          </IconButton>
-          <Routes>
-            {routes.map(
-              ({ layout, pages }) =>
-                layout === "dashboard" &&
-                pages.map(({ path, element }) => (
-                  <Route key={path} exact path={path} element={element} />
-                ))
-            )}
-            <Route path="/quiz/:quizId"        element={<QuizDetail />} />
-            <Route path="/quiz/:quizId/play"   element={<QuizPlay />}   />
-            <Route path="/quiz/:quizId/result" element={<QuizResult />} />
-          </Routes>
-          <div className="text-blue-gray-600">
-            <Footer />
+      <FokusProvider>
+        <div className="min-h-screen" style={{ background: "#eee025" }}>
+          <Sidenav
+            routes={routes}
+            brandImg={sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"}
+          />
+
+          <div className="p-4 xl:ml-80">
+            <DashboardNavbar />
+
+            <Routes>
+              {routes.map(
+                ({ layout, pages }) =>
+                  layout === "dashboard" &&
+                  pages.map(({ path, element }) => (
+                    <Route key={path} exact path={path} element={element} />
+                  ))
+              )}
+              <Route path="/quiz/:quizSlug"        element={<QuizDetail />} />
+              <Route path="/quiz/:quizSlug/play"   element={<QuizPlay />}   />
+              <Route path="/quiz/:quizSlug/result" element={<QuizResult />} />
+            </Routes>
+
+            <div className="text-blue-gray-600">
+              <Footer />
+            </div>
           </div>
+
+          {/* Floating Pomodoro bar — outside content div so it's truly fixed */}
+          <FokusFloatingBar />
         </div>
-      </div>
+      </FokusProvider>
     </MusicProvider>
   );
 }

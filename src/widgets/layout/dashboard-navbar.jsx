@@ -14,7 +14,6 @@ import {
 } from "@material-tailwind/react";
 import {
   UserCircleIcon,
-  Cog6ToothIcon,
   BellIcon,
   ClockIcon,
   CreditCardIcon,
@@ -23,7 +22,7 @@ import {
 } from "@heroicons/react/24/solid";
 import {
   useMaterialTailwindController,
-  setOpenConfigurator,
+
   setOpenSidenav,
 } from "@/context";
 import { useAuth } from "@/context/authContext";
@@ -149,14 +148,6 @@ export function DashboardNavbar() {
               </IconButton>
             </Link>
           )}
-
-          <IconButton
-            variant="text"
-            color="black"
-            onClick={() => setOpenConfigurator(dispatch, true)}
-          >
-            <Cog6ToothIcon className="h-5 w-5 text-black-500" />
-          </IconButton>
         </div>
       </div>
     </Navbar>
