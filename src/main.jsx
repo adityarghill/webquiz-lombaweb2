@@ -8,7 +8,7 @@ import "../public/css/tailwind.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter basename="/material-tailwind-dashboard-react">
+    <BrowserRouter basename="/zooask">
       <ThemeProvider>
         <MaterialTailwindControllerProvider>
           <App />

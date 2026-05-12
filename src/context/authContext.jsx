@@ -148,7 +148,7 @@ export function AuthProvider({ children }) {
       setError(null);
       RateLimiter.recordAttempt(key);
       await sendPasswordResetEmail(auth, email, {
-        url: `${window.location.origin}/material-tailwind-dashboard-react/auth/sign-in`,
+        url: `${window.location.origin}/zooask/auth/sign-in`,
         handleCodeInApp: true,
       });
       return { data: { message: 'Email reset password telah dikirim.' }, error: null };

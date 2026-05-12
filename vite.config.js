@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-const BASE_URL = "/material-tailwind-dashboard-react/";
+const BASE_URL = "/zooask/";
 
 
 function rewritePublicPaths() {
@@ -25,5 +25,14 @@ export default defineConfig({
   plugins: [react(), rewritePublicPaths()],
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
+  },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress lottie-web eval warning
+        if (warning.message.includes("Use of eval")) return;
+        warn(warning);
+      },
+    },
   },
 });

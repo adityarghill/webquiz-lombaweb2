@@ -234,7 +234,7 @@ export function QuizPlay() {
           </svg>
           <p style={{ fontSize: 12, fontWeight: 800, color: "#92400E", margin: 0 }}>
             Mode tamu — progress tidak tersimpan.{" "}
-            <a href="/material-tailwind-dashboard-react/auth/sign-in"
+            <a href="/zooask/auth/sign-in"
               style={{ color: "#D97706", textDecoration: "underline" }}>Login</a> untuk simpan XP.
           </p>
         </div>

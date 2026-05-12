@@ -38,10 +38,10 @@ jobs:
 
       - name: Copy static assets under base path
         run: |
-          mkdir -p dist/material-tailwind-dashboard-react
-          cp -r dist/assets dist/material-tailwind-dashboard-react/ 2>/dev/null || true
-          cp -r dist/img dist/material-tailwind-dashboard-react/ 2>/dev/null || true
-          cp -r dist/css dist/material-tailwind-dashboard-react/ 2>/dev/null || true
+          mkdir -p dist/zooask
+          cp -r dist/assets dist/zooask/ 2>/dev/null || true
+          cp -r dist/img dist/zooask/ 2>/dev/null || true
+          cp -r dist/css dist/zooask/ 2>/dev/null || true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

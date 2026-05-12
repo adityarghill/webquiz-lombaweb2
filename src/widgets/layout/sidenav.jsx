@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
-import { Link, NavLink } from "react-router-dom";
-import { XMarkIcon, LightBulbIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { XMarkIcon, LightBulbIcon, ChartBarIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon } from "@heroicons/react/24/outline";
 import { Button, IconButton, Typography } from "@material-tailwind/react";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
+import { useAuth } from "@/context/authContext";
 
 
 const isAuthPage = (pageName) => {
@@ -21,6 +22,8 @@ const getCustomIcon = (pageName, defaultIcon) => {
 export function Sidenav({ routes }) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { openSidenav } = controller;
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
  
   const cartoonyShadow = "shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]";
@@ -128,6 +131,60 @@ export function Sidenav({ routes }) {
               })}
             </ul>
           ))}
+        </div>
+
+        {/* Auth Buttons */}
+        <div className="border-t-4 border-black px-4 py-4 flex flex-col gap-2">
+          {user ? (
+            <>
+              <Typography
+                variant="small"
+                className="font-black uppercase tracking-wider text-black/70 text-center text-xs mb-2"
+              >
+                👤 {user.email?.split('@')[0]}
+              </Typography>
+              <Button
+                ripple={false}
+                fullWidth
+                onClick={async () => {
+                  await signOut();
+                  setOpenSidenav(dispatch, false);
+                  navigate("/auth/sign-in");
+                }}
+                className={`
+                  flex items-center justify-center gap-3 px-4 py-3 font-extrabold tracking-wide
+                  transition-all duration-150 ease-in
+                  ${buttonShadow} ${buttonHover} ${buttonActive}
+                  rounded-xl border-2 border-black bg-red-500
+                  text-black hover:bg-red-700
+                `}
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                <Typography color="inherit" className="font-black uppercase">
+                  Sign Out
+                </Typography>
+              </Button>
+            </>
+          ) : (
+            <Link to="/auth/sign-in">
+              <Button
+                ripple={false}
+                fullWidth
+                className={`
+                  flex items-center justify-center gap-3 px-4 py-3 font-extrabold tracking-wide
+                  transition-all duration-150 ease-in
+                  ${buttonShadow} ${buttonHover} ${buttonActive}
+                  rounded-xl border-2 border-black bg-green-500
+                  text-black hover:bg-green-700
+                `}
+              >
+                <ArrowLeftOnRectangleIcon className="h-5 w-5" />
+                <Typography color="inherit" className="font-black uppercase">
+                  Sign In
+                </Typography>
+              </Button>
+            </Link>
+          )}
         </div>
       </aside>
     </>

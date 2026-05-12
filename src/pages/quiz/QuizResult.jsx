@@ -75,7 +75,7 @@ export function QuizResult() {
           </svg>
           <span style={{ fontSize: 13, fontWeight: 800, color: "#92400E" }}>
             Kamu belum login — hasil quiz tidak tersimpan.{" "}
-            <a href="/material-tailwind-dashboard-react/auth/sign-in" style={{ color: "#1D4ED8", textDecoration: "underline" }}>
+            <a href="/zooask/auth/sign-in" style={{ color: "#1D4ED8", textDecoration: "underline" }}>
               Login untuk simpan progress
             </a>
           </span>

@@ -86,7 +86,7 @@ Navbar.defaultProps = {
   brandName: "Material Tailwind React",
   action: (
     <a
-      href="https://www.creative-tim.com/product/material-tailwind-dashboard-react"
+      href="https://www.creative-tim.com/product/zooask"
       target="_blank"
     >
       <Button variant="gradient" size="sm" fullWidth>
