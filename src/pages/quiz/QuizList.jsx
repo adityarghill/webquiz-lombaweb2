@@ -338,7 +338,7 @@ export function QuizList() {
         <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
           {filtered.map((quiz) => (
             <Card key={quiz.id} quiz={quiz} bestScore={scores[quiz.id] ?? null}
-              expEarned={expMap[quiz.id] || 0} onClick={(q) => navigate(`/dashboard/quiz/${q.id}`)} />
+              expEarned={expMap[quiz.id] || 0} onClick={(q) => navigate(`/dashboard/quiz/${q.slug}`)} />
           ))}
         </div>
       )}

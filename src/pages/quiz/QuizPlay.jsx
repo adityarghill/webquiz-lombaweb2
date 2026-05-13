@@ -38,7 +38,7 @@ function Spinner() {
 }
 
 export function QuizPlay() {
-  const { quizId } = useParams();
+  const { quizSlug } = useParams();
   const navigate = useNavigate();
   const { user, refreshUserStats } = useAuth(); // Firebase auth
   const uid = user?.uid ?? null;
@@ -56,7 +56,7 @@ export function QuizPlay() {
   const startTime = useRef(Date.now());
   const timerRef = useRef(null);
 
-  useEffect(() => { fetchData(); return () => clearInterval(timerRef.current); }, [quizId]);
+  useEffect(() => { fetchData(); return () => clearInterval(timerRef.current); }, [quizSlug]);
 
   useEffect(() => {
     if (!questions.length) return;
@@ -76,10 +76,23 @@ export function QuizPlay() {
   }, [current, questions.length]);
 
   async function fetchData() {
-    const [{ data: qz }, { data: qs }] = await Promise.all([
-      supabase.from("quizzes").select("*").eq("id", quizId).single(),
-      supabase.from("questions").select("*").eq("quiz_id", quizId).order("order_index"),
-    ]);
+    const { data: qz, error } = await supabase
+      .from("quizzes")
+      .select("*")
+      .eq("slug", quizSlug)
+      .single();
+
+    if (error || !qz) {
+      setLoading(false);
+      return;
+    }
+
+    const { data: qs } = await supabase
+      .from("questions")
+      .select("*")
+      .eq("quiz_id", qz.id)
+      .order("order_index");
+
     setQuiz(qz);
     setQuestions(qs || []);
     setLoading(false);
@@ -111,7 +124,7 @@ export function QuizPlay() {
 
     // Jika tidak login → langsung ke result tanpa simpan
     if (!uid) {
-      navigate(`/dashboard/quiz/${quizId}/result`, {
+      navigate(`/dashboard/quiz/${quizSlug}/result`, {
         state: { score, total: questions.length, expEarned: 0, timeTaken, answers, questions, quiz, savedToCloud: false },
       });
       return;
@@ -123,7 +136,7 @@ export function QuizPlay() {
       /* Step 1: simpan ke quiz_results */
       const { error: rErr } = await supabase.from("quiz_results").insert({
         firebase_uid:       uid,
-        quiz_id:            quizId,
+        quiz_id:            quiz.id,
         score,
         total_questions:    questions.length,
         time_taken_seconds: timeTaken,
@@ -183,14 +196,14 @@ export function QuizPlay() {
 
       console.log(`[QuizPlay] ✓ Saved: score=${score}/${questions.length}, exp=${expEarned}`);
 
-      navigate(`/dashboard/quiz/${quizId}/result`, {
+      navigate(`/dashboard/quiz/${quizSlug}/result`, {
         state: { score, total: questions.length, expEarned, timeTaken, answers, questions, quiz, savedToCloud: true },
       });
 
     } catch (err) {
       console.error("[QuizPlay] Save error:", err.message);
       // Tetap navigate walau ada error
-      navigate(`/dashboard/quiz/${quizId}/result`, {
+      navigate(`/dashboard/quiz/${quizSlug}/result`, {
         state: { score, total: questions.length, expEarned, timeTaken, answers, questions, quiz, savedToCloud: false },
       });
     }

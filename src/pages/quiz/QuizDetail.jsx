@@ -46,9 +46,10 @@ function topicCfg(topic) {
 function MiniCard({ quiz, onClick }) {
   const [hov, setHov] = useState(false);
   const cfg = topicCfg(quiz.topic);
+  
   return (
     <div
-      onClick={() => onClick(quiz.id)}
+      onClick={() => onClick(quiz.slug)}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
@@ -186,7 +187,7 @@ function HistoryRow({ result, index, total }) {
 
 /* ── Page ───────────────────────────────────────────────── */
 export function QuizDetail() {
-  const { quizId } = useParams();
+  const { quizSlug } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [questionCount, setQuestionCount] = useState(0);
@@ -196,32 +197,45 @@ export function QuizDetail() {
   const [startHov, setStartHov] = useState(false);
   const [backHov, setBackHov] = useState(false);
 
-  useEffect(() => { fetchAll(); }, [quizId]);
+  useEffect(() => { fetchAll(); }, [quizSlug]);
 
   async function fetchAll() {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
 
-    const [{ data: q }, { count }, { data: hist }, { data: others }] = await Promise.all([
-      supabase.from("quizzes").select("*").eq("id", quizId).single(),
-      supabase.from("questions").select("*", { count: "exact", head: true }).eq("quiz_id", quizId),
+    // Fetch quiz directly by slug
+    const { data: q, error } = await supabase
+      .from("quizzes")
+      .select("*")
+      .eq("slug", quizSlug)
+      .single();
+
+    if (error || !q) {
+      setLoading(false);
+      return;
+    }
+
+    const [{ count }, { data: hist }, { data: others }] = await Promise.all([
+      supabase.from("questions").select("*", { count: "exact", head: true }).eq("quiz_id", q.id),
       user
         ? supabase.from("quiz_results")
             .select("*")
             .eq("user_id", user.id)
-            .eq("quiz_id", quizId)
+            .eq("quiz_id", q.id)
             .order("completed_at", { ascending: false })
             .limit(5)
         : Promise.resolve({ data: [] }),
       // Fetch 3 other quizzes (different from current)
-      supabase.from("quizzes").select("*, question_count:questions(count)").neq("id", quizId).limit(3),
+      supabase.from("quizzes").select("*, question_count:questions(count)").neq("id", q.id).limit(3),
     ]);
 
-    if (q) { setQuiz(q); setQuestionCount(count || 10); }
+    setQuiz(q);
+    setQuestionCount(count || 10);
     if (hist) setHistory(hist);
     if (others) {
       setOtherQuizzes(others.map((o) => ({
-        ...o, question_count: o.question_count?.[0]?.count ?? 10,
+        ...o,
+        question_count: o.question_count?.[0]?.count ?? 10,
       })));
     }
     setLoading(false);
@@ -461,7 +475,7 @@ export function QuizDetail() {
 
           {/* Start button */}
           <button
-            onClick={() => navigate(`/dashboard/quiz/${quizId}/play`)}
+            onClick={() => navigate(`/dashboard/quiz/${quiz.slug}/play`)}
             onMouseEnter={() => setStartHov(true)}
             onMouseLeave={() => setStartHov(false)}
             style={{
@@ -530,7 +544,7 @@ export function QuizDetail() {
               <MiniCard
                 key={q.id}
                 quiz={q}
-                onClick={(id) => navigate(`/dashboard/quiz/${id}`)}
+                onClick={(slug) => navigate(`/dashboard/quiz/${slug}`)}
               />
             ))}
           </div>
