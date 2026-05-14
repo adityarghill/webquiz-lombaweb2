@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env.example
+node_modules
+.github
+CHANGELOG.md
+README.md
+LICENSE
+dist
+.DS_Store
