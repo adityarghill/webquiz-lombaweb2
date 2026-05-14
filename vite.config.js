@@ -1,27 +1,26 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-const BASE_URL = process.env.NODE_ENV === 'production' ? "/" : "/zooask/";
-
-
 function rewritePublicPaths() {
   return {
     name: "rewrite-public-paths",
     transform(code, id) {
       if (id.includes("node_modules")) return null;
       if (!/\.(jsx?|tsx?)$/.test(id)) return null;
+
       const rewritten = code.replace(
         /(=\s*|:\s*)["'](\/img\/)([^"']*)["']/g,
         (_, prefix, _slashImg, rest) =>
           `${prefix}(import.meta.env.BASE_URL + 'img/${rest.replace(/'/g, "\\'")}')`
       );
+
       return rewritten !== code ? { code: rewritten } : null;
     },
   };
 }
 
 export default defineConfig({
-  base: BASE_URL,
+  base: "/",
   plugins: [react(), rewritePublicPaths()],
   resolve: {
     alias: [{ find: "@", replacement: "/src" }],
@@ -29,7 +28,6 @@ export default defineConfig({
   build: {
     rollupOptions: {
       onwarn(warning, warn) {
-        // Suppress lottie-web eval warning
         if (warning.message.includes("Use of eval")) return;
         warn(warning);
       },
