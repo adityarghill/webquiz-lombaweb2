@@ -302,61 +302,6 @@ ZooAsk fully responsive dan bekerja sempurna di:
 
 ---
 
-## 🚦 Getting Started for Developers
-
-### Prerequisites untuk Development
-```bash
-# Install Node.js dan npm
-node --version
-npm --version
-
-# Install global tools
-npm install -g vite
-```
-
-### Development Workflow
-
-1. **Create feature branch**
-```bash
-git checkout -b feature/your-feature-name
-```
-
-2. **Make changes dan test**
-```bash
-npm run dev
-```
-
-3. **Commit changes**
-```bash
-git add .
-git commit -m "feat: description of changes"
-```
-
-4. **Push dan create PR**
-```bash
-git push origin feature/your-feature-name
-```
-
----
-
-## 🤝 Contributing
-
-Kami sangat welcome untuk kontribusi! Berikut cara berkontribusi:
-
-1. **Fork** repository
-2. **Create feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit changes** (`git commit -m 'Add some AmazingFeature'`)
-4. **Push to branch** (`git push origin feature/AmazingFeature`)
-5. **Open Pull Request**
-
-### Development Guidelines
-- Ikuti code style yang ada (Prettier configured)
-- Tulis meaningful commit messages
-- Test feature sebelum submit PR
-- Update dokumentasi jika diperlukan
-
----
-
 ## 📄 File Descriptions
 
 | File | Purpose |
@@ -392,26 +337,6 @@ npm install
 - Verify `.env.local` configuration
 - Check Firebase project settings
 - Ensure API keys are correct
-
----
-
-## 📊 Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 2.1.0 | 2023-11-14 | Upgrade to Material Tailwind v2 |
-| 2.0.0 | 2022-11-02 | Complete restructure, migrate to Vite & React 18 |
-| 1.1.0 | 2021-06-10 | Add download feature |
-| 1.0.0 | 2021-06-08 | Initial release |
-
----
-
-## 📞 Support
-
-- 📧 Email: support@zooask.com
-- 💬 Discord: [Join our community]
-- 🐛 Issues: [Report on GitHub]
-- 💡 Discussions: [Start a discussion]
 
 ---
 
